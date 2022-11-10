@@ -555,3 +555,284 @@ def calcHet(bam, bed, min_calls, min_cov, threads, hap, out):
     with open(out, "w") as o:
         for rec in results:
             print("\t".join(rec), end="\n", file=o)
+
+
+
+@cli.command(name="print_reads")
+@click.argument("bams", nargs=-1, type=click.Path(exists=True), required=True)
+@click.option(
+    "-r",
+    "--region",
+    required=False,
+    type=str,
+    help="Region of interest. example: chr21:1-1000",
+)
+@click.option(
+    "-br",
+    "--batch",
+    is_flag=False,
+    default=None,
+    required=False,
+    type=click.Path(exists=True),
+    help="makes html/pdf report for all regions in the bed file",
+)
+@click.option(
+    "-g",
+    "--gtf",
+    multiple=True,
+    is_flag=False,
+    default=None,
+    required=False,
+    type=click.Path(exists=True),
+    help="makes gene tracks from sorted and tabix gtf files",
+)
+@click.option(
+    "-b",
+    "--bed",
+    multiple=True,
+    is_flag=False,
+    default=None,
+    required=False,
+    type=click.Path(exists=True),
+    help="makes tracks from sorted and tabix bed files. This will plot each interval as a rectangle (similar to gtf)",
+)
+@click.option(
+    "-bw",
+    "--bigwig",
+    multiple=True,
+    is_flag=False,
+    default=None,
+    required=False,
+    type=click.Path(exists=True),
+    help="makes a track from bigwig files",
+)
+@click.option(
+    "-bd",
+    "--bedgraph",
+    multiple=True,
+    is_flag=False,
+    default=None,
+    required=False,
+    type=click.Path(exists=True),
+    help="makes a track from bedgraph files",
+)
+@click.option(
+    "-s",
+    "--samples",
+    is_flag=False,
+    default=None,
+    type=str,
+    help="sample names per each bam input",
+)
+@click.option(
+    "-tr",
+    "--track-titles",
+    is_flag=False,
+    default=None,
+    type=str,
+    help="titles of tracks provided in order of gtf files, bed files, bigwig files, bedgraph files",
+)
+@click.option(
+    "-hp",
+    "--hap",
+    is_flag=True,
+    default=None,
+    help="reads will be grouped according to HP tag in bam (comma separated)",
+)
+@click.option(
+    "-st",
+    "--strands",
+    is_flag=True,
+    default=None,
+    help="reads will be grouped by strand in bam",
+)
+@click.option(
+    "-o",
+    "--out",
+    required=True,
+    type=click.Path(exists=True),
+    help="output path",
+)
+@click.option(
+    "-p",
+    "--prefix",
+    required=False,
+    type=str,
+    default="modbamviz",
+    help="File name for output",
+)
+@click.option(
+    "-u",
+    "--can_prob",
+    is_flag=False,
+    default=0.5,
+    type=float,
+    help="probability threshold for canonical bases",
+)
+@click.option(
+    "-m",
+    "--mod_prob",
+    is_flag=False,
+    default=0.5,
+    type=float,
+    help="probability threshold for modified bases",
+)
+@click.option(
+    "-h",
+    "--height",
+    is_flag=False,
+    default=None,
+    type=int,
+    help="height of plot in px. This is for fine tuning, the height is automatically calculated.",
+)
+@click.option(
+    "-w", "--width", is_flag=False, default=None, type=int, help="width of plot in px"
+)
+@click.option(
+    "-c",
+    "--cluster",
+    is_flag=True,
+    default=None,
+    type=int,
+    help="cluster the reads based on modification state",
+)
+@click.option(
+    "-ht",
+    "--heterogeneity",
+    is_flag=True,
+    default=None,
+    type=int,
+    help="plot degree of modification heterogeneity across the region",
+)
+@click.option(
+    "-fs",
+    "--font_size",
+    is_flag=False,
+    default=18,
+    type=int,
+    help="global font size",
+)
+@click.option(
+    "-ms",
+    "--marker_size",
+    is_flag=False,
+    default=6,
+    type=float,
+    help="marker size of each modified/unmodified base",
+)
+@click.option(
+    "-sth",
+    "--single_trace_height",
+    is_flag=False,
+    default=12,
+    type=int,
+    help="space between single molucles in px",
+)
+def print_reads(
+    bams,
+    region,
+    gtf,
+    bed,
+    bigwig,
+    bedgraph,
+    samples,
+    hap,
+    out,
+    can_prob,
+    mod_prob,
+    height,
+    width,
+    prefix,
+    strands,
+    batch,
+    track_titles,
+    cluster,
+    heterogeneity,
+    font_size,
+    marker_size,
+    single_trace_height,
+):
+    "Printing mod info per read:"
+    if batch:
+        out_path = out + "/" + prefix + ".txt" 
+        if samples:
+            samples = [s for s in samples.strip().split(",")]
+        if track_titles:
+            track_titles = [t for t in track_titles.strip().split(",")]
+
+
+        with open(batch, "r") as b:
+            for l in b:
+                if l[0] == "#":
+                    continue
+                click.echo("processing " + l)
+                line = l.strip().split("\t")
+                chrom = line[0]
+                start = int(line[1])
+                end = int(line[2])
+                if cluster:
+                    dicts, titles = cluster2dicts(bams, chrom, start, end)
+                if not cluster:
+                    dicts, titles = get_reads(
+                        bams,
+                        chrom,
+                        start,
+                        end,
+                        hap=hap,
+                        strand=strands,
+                        samp_names=samples,
+                        min_prob=can_prob,
+                        max_prob=mod_prob,
+                    )
+                
+                # Write reads to txt
+                r=open(out_path,'a')
+                for i, sample_dict in enumerate(dicts):
+                    r.write("sample "+ i)
+                    r.write("\n")
+                    for line, reads in sample_dict.items():
+                        for read in reads:
+                            r.write(read)
+                            r.write("\n")     
+
+
+    elif region:
+        chrom = region.strip().split(":")[0]
+        start = int(region.strip().split(":")[1].split("-")[0])
+        end = int(region.strip().split(":")[1].split("-")[1])
+        if samples:
+            samples = [s for s in samples.strip().split(",")]
+        if track_titles:
+            track_titles = [t for t in track_titles.strip().split(",")]
+        if cluster:
+            dicts, titles = cluster2dicts(bams, chrom, start, end)
+        if not cluster:
+            dicts, titles = get_reads(
+                bams,
+                chrom,
+                start,
+                end,
+                hap=hap,
+                strand=strands,
+                samp_names=samples,
+                min_prob=can_prob,
+                max_prob=mod_prob,
+            )
+
+
+        out_path = out + "/" + prefix + ".txt"
+        r=open(out_path,'w')
+        for i, sample_dict in enumerate(dicts):
+            r.write("sample "+ i)
+            r.write("\n")
+            for line, reads in sample_dict.items():
+                for read in reads:
+                    r.write(read)
+                    r.write("\n")
+        
+    else:
+        click.echo(
+            "Please choose either a region (--region) or bed file of regions (--batch) to process"
+        )
+
+    click.echo("Successfully processed modified bases! ")
