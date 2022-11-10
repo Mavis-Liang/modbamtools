@@ -828,7 +828,7 @@ def print_reads(
             for line, reads in sample_dict.items():
                 for read in reads:
                     r.write(read)
-                    r.write("\n")
+                    r.write("\n") ## Edited
         
     else:
         click.echo(
