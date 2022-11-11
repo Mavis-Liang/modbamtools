@@ -791,7 +791,7 @@ def print_reads(
                     r.write("\n")
                     for line, reads in sample_dict.items():
                         for read in reads:
-                            r.write(read)
+                            r.write(str(read))
                             r.write("\n")     
 
 
@@ -826,7 +826,7 @@ def print_reads(
             r.write("\n")
             for line, reads in sample_dict.items():
                 for read in reads:
-                    r.write(read)
+                    r.write(str(read))
                     r.write("\n") ## Edited
         
     else:
