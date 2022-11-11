@@ -788,11 +788,11 @@ def print_reads(
                 # Write reads to txt
                 r=open(out_path,'a')
                 for i, sample_dict in enumerate(dicts):
-                    r.write("sample "+ i)
+                    r.write("sample "+ str(i))
                     r.write("\n")
                     for line, reads in sample_dict.items():
                         for read in reads:
-                            r.write(read)
+                            r.write(str(read))
                             r.write("\n")     
 
 
@@ -823,11 +823,11 @@ def print_reads(
         out_path = out + "/" + prefix + ".txt"
         r=open(out_path,'w')
         for i, sample_dict in enumerate(dicts):
-            r.write("sample "+ i)
+            r.write("sample "+ str(i))
             r.write("\n")
             for line, reads in sample_dict.items():
                 for read in reads:
-                    r.write(read)
+                    r.write(str(read))
                     r.write("\n") ## Edited
         
     else:
@@ -1069,7 +1069,7 @@ def print_freqs(
                 r=open(out_path,'a')
                 for i, sample_dict in enumerate(dicts):
                     freq, freq_smooth = calc_freq(sample_dict, start, end)
-                    r.write("sample "+ i)
+                    r.write("sample "+ str(i))
                     r.write("\n")
                     r.write(str(freq))
                     r.write("\n")     
@@ -1103,7 +1103,7 @@ def print_freqs(
         r=open(out_path,'w')
         for i, sample_dict in enumerate(dicts):
             freq, freq_smooth = calc_freq(sample_dict, start, end)
-            r.write("sample "+ i)
+            r.write("sample "+ str(i))
             r.write("\n")
             r.write(str(freq))
             r.write("\n")
