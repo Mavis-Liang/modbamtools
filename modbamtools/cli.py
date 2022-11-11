@@ -657,7 +657,7 @@ def calcHet(bam, bed, min_calls, min_cov, threads, hap, out):
     "--prefix",
     required=False,
     type=str,
-    default="modbamviz",
+    default="modbamreads",
     help="File name for output",
 )
 @click.option(
@@ -787,7 +787,7 @@ def print_reads(
                 # Write reads to txt
                 r=open(out_path,'a')
                 for i, sample_dict in enumerate(dicts):
-                    r.write("sample "+ i)
+                    r.write("sample "+ str(i))
                     r.write("\n")
                     for line, reads in sample_dict.items():
                         for read in reads:
@@ -822,7 +822,7 @@ def print_reads(
         out_path = out + "/" + prefix + ".txt"
         r=open(out_path,'w')
         for i, sample_dict in enumerate(dicts):
-            r.write("sample "+ i)
+            r.write("sample "+ str(i))
             r.write("\n")
             for line, reads in sample_dict.items():
                 for read in reads:
