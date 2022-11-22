@@ -557,8 +557,7 @@ def calcHet(bam, bed, min_calls, min_cov, threads, hap, out):
             print("\t".join(rec), end="\n", file=o)
 
 
-
-@cli.command(name="print_reads")
+@cli.command(name="print_freqs")
 @click.argument("bams", nargs=-1, type=click.Path(exists=True), required=True)
 @click.option(
     "-r",
@@ -658,7 +657,7 @@ def calcHet(bam, bed, min_calls, min_cov, threads, hap, out):
     "--prefix",
     required=False,
     type=str,
-    default="modbamviz",
+    default="freq",
     help="File name for output",
 )
 @click.option(
@@ -728,7 +727,7 @@ def calcHet(bam, bed, min_calls, min_cov, threads, hap, out):
     type=int,
     help="space between single molucles in px",
 )
-def print_reads(
+def print_freqs(
     bams,
     region,
     gtf,
@@ -752,7 +751,7 @@ def print_reads(
     marker_size,
     single_trace_height,
 ):
-    "Printing CpG mod (0 or 1) bases per read"
+    "Printing mod frequencies for a region"
     if batch:
         out_path = out + "/" + prefix + ".txt" 
         if samples:
@@ -788,12 +787,11 @@ def print_reads(
                 # Write reads to txt
                 r=open(out_path,'a')
                 for i, sample_dict in enumerate(dicts):
+                    freq, freq_smooth = calc_freq(sample_dict, start, end)
                     r.write("sample "+ str(i))
                     r.write("\n")
-                    for line, reads in sample_dict.items():
-                        for read in reads:
-                            r.write(str(read))
-                            r.write("\n")     
+                    r.write(str(freq))
+                    r.write("\n")     
 
 
     elif region:
@@ -823,16 +821,15 @@ def print_reads(
         out_path = out + "/" + prefix + ".txt"
         r=open(out_path,'w')
         for i, sample_dict in enumerate(dicts):
+            freq, freq_smooth = calc_freq(sample_dict, start, end)
             r.write("sample "+ str(i))
             r.write("\n")
-            for line, reads in sample_dict.items():
-                for read in reads:
-                    r.write(str(read))
-                    r.write("\n") ## Edited
+            r.write(str(freq))
+            r.write("\n")
         
     else:
         click.echo(
             "Please choose either a region (--region) or bed file of regions (--batch) to process"
         )
 
-    click.echo("Successfully output modified bases! ")
+    click.echo("Successfully output frequencies! ")
