@@ -37,6 +37,28 @@ def overlaps(a, b):
 
     return min(a[1], b[1]) - max(a[0], b[0])
 
+def mod_counts(dict_per_read_mod, start, end):
+    df = pd.DataFrame.from_dict(
+        {k: v[2] for k, v in dict_per_read_mod.items()}, orient="index"
+    )
+    df = df[df.columns[df.columns.isin(range(start, end))]]
+    df = df.reindex(sorted(df.columns), axis=1)
+
+    count_table = {"pos": [], "mod": [], "unmod": [], "NaN": []}
+    for pos in df.columns:
+        count = df[pos].value_counts(dropna = False).to_dict()
+        if 0 not in count.keys():
+            count[0] = 0
+        if 1 not in count.keys():
+            count[1] = 0
+        if "NaN" not in count.keys():
+            count["NaN"] = 0
+        count_table["pos"].append(pos)
+        count_table["mod"].append(count[1])
+        count_table["unmod"].append(count[0])
+        count_table["NaN"].append(count["NaN"])
+    return count_table
+        
 
 def calc_freq(dict_per_read_mod, start, end):
     # print(dict_per_read_mod)

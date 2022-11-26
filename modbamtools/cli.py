@@ -557,7 +557,7 @@ def calcHet(bam, bed, min_calls, min_cov, threads, hap, out):
             print("\t".join(rec), end="\n", file=o)
 
 
-@cli.command(name="print_freqs")
+@cli.command(name="print_counts")
 @click.argument("bams", nargs=-1, type=click.Path(exists=True), required=True)
 @click.option(
     "-r",
@@ -727,7 +727,7 @@ def calcHet(bam, bed, min_calls, min_cov, threads, hap, out):
     type=int,
     help="space between single molucles in px",
 )
-def print_freqs(
+def print_counts(
     bams,
     region,
     gtf,
@@ -751,7 +751,7 @@ def print_freqs(
     marker_size,
     single_trace_height,
 ):
-    "Printing mod frequencies for a region"
+    "Printing mod/unmode counts for a region"
     if batch:
         out_path = out + "/" + prefix + ".txt" 
         if samples:
@@ -819,17 +819,17 @@ def print_freqs(
 
 
         out_path = out + "/" + prefix + ".txt"
-        r=open(out_path,'w')
+        r=open(out_path,'a')
+        r.write("chr,pos,mod,unmod,NaN")
+        r.write("/n")
         for i, sample_dict in enumerate(dicts):
-            freq, freq_smooth = calc_freq(sample_dict, start, end)
-            r.write("sample "+ str(i))
-            r.write("\n")
-            r.write(str(freq))
-            r.write("\n")
-        
+            count_table = mod_counts(sample_dict, start, end)
+            count_pdDF = pd.DataFrame(count_table.items())
+            count_pdDF.to_csv(out_path, index=False, mode="a", header=False)
     else:
         click.echo(
-            "Please choose either a region (--region) or bed file of regions (--batch) to process"
+            "Printing all regions..."
         )
 
-    click.echo("Successfully output frequencies! ")
+
+    click.echo("Successfully output mod/unmod counts to txt! ")
