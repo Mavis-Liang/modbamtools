@@ -823,7 +823,7 @@ def print_counts(
         r.write("chr,pos,mod,unmod,NaN")
         r.write("/n")
         for i, sample_dict in enumerate(dicts):
-            count_table = mod_counts(sample_dict, start, end)
+            count_table = mod_counts(sample_dict, chrom, start, end)
             count_pdDF = pd.DataFrame(count_table.items())
             count_pdDF.to_csv(out_path, index=False, mode="a", header=False)
     else:

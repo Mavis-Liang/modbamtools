@@ -37,14 +37,14 @@ def overlaps(a, b):
 
     return min(a[1], b[1]) - max(a[0], b[0])
 
-def mod_counts(dict_per_read_mod, start, end):
+def mod_counts(dict_per_read_mod, chrom, start, end):
     df = pd.DataFrame.from_dict(
         {k: v[2] for k, v in dict_per_read_mod.items()}, orient="index"
     )
     df = df[df.columns[df.columns.isin(range(start, end))]]
     df = df.reindex(sorted(df.columns), axis=1)
 
-    count_table = {"pos": [], "mod": [], "unmod": [], "NaN": []}
+    count_table = {"chr": [], "pos": [], "mod": [], "unmod": [], "NaN": []}
     for pos in df.columns:
         count = df[pos].value_counts(dropna = False).to_dict()
         if 0 not in count.keys():
@@ -53,6 +53,7 @@ def mod_counts(dict_per_read_mod, start, end):
             count[1] = 0
         if "NaN" not in count.keys():
             count["NaN"] = 0
+        count_table["chr"].append(chrom)
         count_table["pos"].append(pos)
         count_table["mod"].append(count[1])
         count_table["unmod"].append(count[0])
