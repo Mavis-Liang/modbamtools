@@ -557,7 +557,7 @@ def calcHet(bam, bed, min_calls, min_cov, threads, hap, out):
             print("\t".join(rec), end="\n", file=o)
 
 
-@cli.command(name="print_freqs")
+@cli.command(name="print_counts")
 @click.argument("bams", nargs=-1, type=click.Path(exists=True), required=True)
 @click.option(
     "-r",
@@ -727,7 +727,7 @@ def calcHet(bam, bed, min_calls, min_cov, threads, hap, out):
     type=int,
     help="space between single molucles in px",
 )
-def print_freqs(
+def print_counts(
     bams,
     region,
     gtf,
@@ -751,7 +751,7 @@ def print_freqs(
     marker_size,
     single_trace_height,
 ):
-    "Printing mod frequencies for a region"
+    "Printing mod/unmode counts for a region"
     if batch:
         out_path = out + "/" + prefix + ".txt" 
         if samples:
@@ -829,7 +829,8 @@ def print_freqs(
         
     else:
         click.echo(
-            "Please choose either a region (--region) or bed file of regions (--batch) to process"
+            "Printing all regions..."
         )
 
-    click.echo("Successfully output frequencies! ")
+
+    click.echo("Successfully output mod/unmod counts to txt! ")
