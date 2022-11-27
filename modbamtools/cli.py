@@ -738,8 +738,7 @@ def print_counts(
         end = int(region.strip().split(":")[1].split("-")[1])
         if samples:
             samples = [s for s in samples.strip().split(",")]
-        if track_titles:
-            track_titles = [t for t in track_titles.strip().split(",")]
+        
         if cluster:
             dicts, titles = cluster2dicts(bams, chrom, start, end)
         if not cluster:
