@@ -754,23 +754,18 @@ def print_counts(
                 max_prob=mod_prob,
             )
 
-        if strands:
-            strand_name = np.array([x[:-1] for x in titles])
-            pos_index = np.where(strand_name == "+")[0]
-            neg_index = np.where(strand_name == "-")[0]
-
             out_path = out + "/" + prefix + ".csv"
             with open(out_path,'a') as r:
                 r.write("chr,pos,strand,mod,unmod,NaN")
                 r.write("\n")
-                for i, sample_dict in enumerate(dicts):
-                    count_table_pos = mod_counts(sample_dict[pos_index], chrom, "pos", start, end)
-                    count_table_neg = mod_counts(sample_dict[neg_index], chrom, "neg", start, end)
-                    # Convert dict to pandas df
-                    count_pos_pdDF = pd.DataFrame.from_dict(count_table_pos)
-                    count_neg_pdDF = pd.DataFrame.from_dict(count_table_neg)
-                    count_pdDF = pd.concat([count_pos_pdDF, count_neg_pdDF]).sort_values(by=["pos"])
-                    count_pdDF.to_csv(r, index=False, header=False)
+                
+                count_table_pos = mod_counts(dicts[0], chrom, "neg", start, end)
+                count_table_neg = mod_counts(dicts[1], chrom, "pos", start, end)
+                # Convert dict to pandas df
+                count_pos_pdDF = pd.DataFrame.from_dict(count_table_pos)
+                count_neg_pdDF = pd.DataFrame.from_dict(count_table_neg)
+                count_pdDF = pd.concat([count_pos_pdDF, count_neg_pdDF]).sort_values(by=["pos"])
+                count_pdDF.to_csv(r, index=False, header=False)
         
         else:
             out_path = out + "/" + prefix + ".csv"
