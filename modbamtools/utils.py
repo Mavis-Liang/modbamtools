@@ -37,15 +37,21 @@ def overlaps(a, b):
 
     return min(a[1], b[1]) - max(a[0], b[0])
 
-def mod_counts(dict_per_read_mod, chrom, start, end):
+def mod_counts(dict_per_read_mod, chrom, strand, start, end):
     df = pd.DataFrame.from_dict(
         {k: v[2] for k, v in dict_per_read_mod.items()}, orient="index"
     )
     df = df[df.columns[df.columns.isin(range(start, end))]]
     df = df.reindex(sorted(df.columns), axis=1)
 
-    count_table = {"chr": [], "pos": [], "mod": [], "unmod": [], "NaN": []}
+    count_table = {"chr": [], "pos": [], "strand": [], "mod": [], "unmod": [], "NaN": []}
+    # Define chrom and strand
     chr = int(chrom[3:])
+    if strand == "pos":
+        strand_name = "+"
+    elif strand == "neg":
+        strand_name = "-"
+    
     for pos in df.columns:
         count = df[pos].value_counts(dropna = False).to_dict()
         if 0 not in count.keys():
@@ -56,6 +62,7 @@ def mod_counts(dict_per_read_mod, chrom, start, end):
             count["NaN"] = 0
         count_table["chr"].append(chr)
         count_table["pos"].append(pos)
+        count_table["strand"].append(strand_name)
         count_table["mod"].append(count[1])
         count_table["unmod"].append(count[0])
         count_table["NaN"].append(count["NaN"])

@@ -576,16 +576,6 @@ def calcHet(bam, bed, min_calls, min_cov, threads, hap, out):
     help="makes html/pdf report for all regions in the bed file",
 )
 @click.option(
-    "-g",
-    "--gtf",
-    multiple=True,
-    is_flag=False,
-    default=None,
-    required=False,
-    type=click.Path(exists=True),
-    help="makes gene tracks from sorted and tabix gtf files",
-)
-@click.option(
     "-b",
     "--bed",
     multiple=True,
@@ -624,14 +614,6 @@ def calcHet(bam, bed, min_calls, min_cov, threads, hap, out):
     help="sample names per each bam input",
 )
 @click.option(
-    "-tr",
-    "--track-titles",
-    is_flag=False,
-    default=None,
-    type=str,
-    help="titles of tracks provided in order of gtf files, bed files, bigwig files, bedgraph files",
-)
-@click.option(
     "-hp",
     "--hap",
     is_flag=True,
@@ -642,14 +624,15 @@ def calcHet(bam, bed, min_calls, min_cov, threads, hap, out):
     "-st",
     "--strands",
     is_flag=True,
-    default=None,
+    default=True,
     help="reads will be grouped by strand in bam",
 )
 @click.option(
     "-o",
     "--out",
-    required=True,
+    required=False,
     type=click.Path(exists=True),
+    default=".",
     help="output path",
 )
 @click.option(
@@ -677,17 +660,6 @@ def calcHet(bam, bed, min_calls, min_cov, threads, hap, out):
     help="probability threshold for modified bases",
 )
 @click.option(
-    "-h",
-    "--height",
-    is_flag=False,
-    default=None,
-    type=int,
-    help="height of plot in px. This is for fine tuning, the height is automatically calculated.",
-)
-@click.option(
-    "-w", "--width", is_flag=False, default=None, type=int, help="width of plot in px"
-)
-@click.option(
     "-c",
     "--cluster",
     is_flag=True,
@@ -703,34 +675,9 @@ def calcHet(bam, bed, min_calls, min_cov, threads, hap, out):
     type=int,
     help="plot degree of modification heterogeneity across the region",
 )
-@click.option(
-    "-fs",
-    "--font_size",
-    is_flag=False,
-    default=18,
-    type=int,
-    help="global font size",
-)
-@click.option(
-    "-ms",
-    "--marker_size",
-    is_flag=False,
-    default=6,
-    type=float,
-    help="marker size of each modified/unmodified base",
-)
-@click.option(
-    "-sth",
-    "--single_trace_height",
-    is_flag=False,
-    default=12,
-    type=int,
-    help="space between single molucles in px",
-)
 def print_counts(
     bams,
     region,
-    gtf,
     bed,
     bigwig,
     bedgraph,
@@ -739,19 +686,15 @@ def print_counts(
     out,
     can_prob,
     mod_prob,
-    height,
-    width,
     prefix,
     strands,
     batch,
     track_titles,
     cluster,
     heterogeneity,
-    font_size,
-    marker_size,
     single_trace_height,
 ):
-    "Print mod/unmode counts for a region to a csv"
+    "Print modified/unmodified counts for a region to a csv"
     if batch:
         out_path = out + "/" + prefix + ".txt" 
         if samples:
@@ -784,7 +727,7 @@ def print_counts(
                         max_prob=mod_prob,
                     )
                 
-                # Write reads to txt
+                # Write reads to csv
                 r=open(out_path,'a')
                 for i, sample_dict in enumerate(dicts):
                     freq, freq_smooth = calc_freq(sample_dict, start, end)
@@ -817,15 +760,29 @@ def print_counts(
                 max_prob=mod_prob,
             )
 
+        if strands:
+            strand_name = np.array([x[:-1] for x in titles])
+            pos_index = np.where(strand_name == "+")[0]
+            neg_index = np.where(strand_name == "-")[0]
 
-        out_path = out + "/" + prefix + ".csv"
-        with open(out_path,'a') as r:
-            r.write("chr,pos,mod,unmod,NaN")
-            r.write("\n")
-            for i, sample_dict in enumerate(dicts):
-                count_table = mod_counts(sample_dict, chrom, start, end)
-                count_pdDF = pd.DataFrame.from_dict(count_table)
-                count_pdDF.to_csv(r, index=False, header=False)
+            out_path = out + "/" + prefix + ".csv"
+            with open(out_path,'a') as r:
+                r.write("chr,pos,strand,mod,unmod,NaN")
+                r.write("\n")
+                for i, sample_dict in enumerate(dicts):
+                    count_table_pos = mod_counts(sample_dict[pos_index], chrom, "pos", start, end)
+                    count_table_neg = mod_counts(sample_dict[neg_index], chrom, "neg", start, end)
+                    # Convert dict to pandas df
+                    count_pos_pdDF = pd.DataFrame.from_dict(count_table_pos)
+                    count_neg_pdDF = pd.DataFrame.from_dict(count_table_neg)
+                    count_pdDF = pd.concat([count_pos_pdDF, count_neg_pdDF]).sort_values(by=["pos"])
+                    count_pdDF.to_csv(r, index=False, header=False)
+        
+        else:
+            out_path = out + "/" + prefix + ".csv"
+            with open(out_path,'a') as r:
+                r.write("chr,pos,mod,unmod,NaN")
+                r.write("\n")
     else:
         click.echo(
             "Printing all regions..."
