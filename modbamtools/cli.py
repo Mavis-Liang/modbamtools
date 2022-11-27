@@ -697,9 +697,6 @@ def print_counts(
         out_path = out + "/" + prefix + ".txt" 
         if samples:
             samples = [s for s in samples.strip().split(",")]
-        if track_titles:
-            track_titles = [t for t in track_titles.strip().split(",")]
-
 
         with open(batch, "r") as b:
             for l in b:
