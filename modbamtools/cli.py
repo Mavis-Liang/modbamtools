@@ -689,10 +689,8 @@ def print_counts(
     prefix,
     strands,
     batch,
-    track_titles,
     cluster,
     heterogeneity,
-    single_trace_height,
 ):
     "Print modified/unmodified counts for a region to a csv"
     if batch:
