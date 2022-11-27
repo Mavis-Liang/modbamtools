@@ -45,6 +45,7 @@ def mod_counts(dict_per_read_mod, chrom, start, end):
     df = df.reindex(sorted(df.columns), axis=1)
 
     count_table = {"chr": [], "pos": [], "mod": [], "unmod": [], "NaN": []}
+    chr = int(chrom[3:])
     for pos in df.columns:
         count = df[pos].value_counts(dropna = False).to_dict()
         if 0 not in count.keys():
@@ -53,7 +54,7 @@ def mod_counts(dict_per_read_mod, chrom, start, end):
             count[1] = 0
         if "NaN" not in count.keys():
             count["NaN"] = 0
-        count_table["chr"].append(chrom)
+        count_table["chr"].append(chr)
         count_table["pos"].append(pos)
         count_table["mod"].append(count[1])
         count_table["unmod"].append(count[0])

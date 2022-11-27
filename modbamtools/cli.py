@@ -657,7 +657,7 @@ def calcHet(bam, bed, min_calls, min_cov, threads, hap, out):
     "--prefix",
     required=False,
     type=str,
-    default="freq",
+    default="counts",
     help="File name for output",
 )
 @click.option(
@@ -751,7 +751,7 @@ def print_counts(
     marker_size,
     single_trace_height,
 ):
-    "Printing mod/unmode counts for a region"
+    "Print mod/unmode counts for a region to a csv"
     if batch:
         out_path = out + "/" + prefix + ".txt" 
         if samples:
@@ -818,18 +818,18 @@ def print_counts(
             )
 
 
-        out_path = out + "/" + prefix + ".txt"
-        r=open(out_path,'a')
-        r.write("chr,pos,mod,unmod,NaN")
-        r.write("/n")
-        for i, sample_dict in enumerate(dicts):
-            count_table = mod_counts(sample_dict, chrom, start, end)
-            count_pdDF = pd.DataFrame(count_table.items())
-            count_pdDF.to_csv(out_path, index=False, mode="a", header=False)
+        out_path = out + "/" + prefix + ".csv"
+        with open(out_path,'a') as r:
+            r.write("chr,pos,mod,unmod,NaN")
+            r.write("\n")
+            for i, sample_dict in enumerate(dicts):
+                count_table = mod_counts(sample_dict, chrom, start, end)
+                count_pdDF = pd.DataFrame.from_dict(count_table)
+                count_pdDF.to_csv(r, index=False, header=False)
     else:
         click.echo(
             "Printing all regions..."
         )
 
 
-    click.echo("Successfully output mod/unmod counts to txt! ")
+    click.echo("Successfully output mod/unmod counts to csv! ")
