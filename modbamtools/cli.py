@@ -755,8 +755,8 @@ def print_counts(
             )
 
             out_path = out + "/" + prefix + ".csv"
-            with open(out_path,'a') as r:
-                r.write("chr,pos,strand,mod,unmod,NaN")
+            with open(out_path,'w') as r:
+                r.write("chr,pos,strand,mod,nonmod,unkonwn")
                 r.write("\n")
                 
                 count_table_pos = mod_counts(dicts[0], chrom, "neg", start, end)
