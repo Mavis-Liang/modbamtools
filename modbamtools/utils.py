@@ -59,13 +59,13 @@ def mod_counts(dict_per_read_mod, chrom, strand, start, end):
         if 1 not in count.keys():
             count[1] = 0
         if -1 not in count.keys():
-            count[-1] = 0
+            count["-1"] = 0
         count_table["chr"].append(chr)
         count_table["pos"].append(pos)
         count_table["strand"].append(strand_name)
         count_table["mod"].append(count[1])
-        count_table["nonmod"].append(count[0])
-        count_table["unknown"].append(count[-1])
+        count_table["nonmod"].append(count[1])
+        count_table["unknown"].append(count["-1"])
     return count_table
         
 
