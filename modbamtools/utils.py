@@ -44,7 +44,7 @@ def mod_counts(dict_per_read_mod, chrom, strand, start, end):
     df = df[df.columns[df.columns.isin(range(start, end))]]
     df = df.reindex(sorted(df.columns), axis=1)
 
-    count_table = {"chr": [], "pos": [], "strand": [], "mod": [], "unmod": [], "NaN": []}
+    count_table = {"chr": [], "pos": [], "strand": [], "mod": [], "nonmod": [], "unknown": []}
     # Define chrom and strand
     chr = int(chrom[3:])
     if strand == "pos":
@@ -58,14 +58,14 @@ def mod_counts(dict_per_read_mod, chrom, strand, start, end):
             count[0] = 0
         if 1 not in count.keys():
             count[1] = 0
-        if "NaN" not in count.keys():
-            count["NaN"] = 0
+        if -1 not in count.keys():
+            count[-1] = 0
         count_table["chr"].append(chr)
         count_table["pos"].append(pos)
         count_table["strand"].append(strand_name)
         count_table["mod"].append(count[1])
-        count_table["unmod"].append(count[0])
-        count_table["NaN"].append(count["NaN"])
+        count_table["nonmod"].append(count[0])
+        count_table["unknown"].append(count[-1])
     return count_table
         
 
@@ -212,12 +212,10 @@ def process_bam_strands(
                 qname, rpos, qpos, strand, mod_strand, cbase, mbase, score = pos_mod
                 if strand == "-":
                     call = binerize_mod_call(score, min_prob, max_prob)
-                    if call != -1:
-                        mapped_modbase_neg[rpos - 1] = call
+                    mapped_modbase_neg[rpos - 1] = call
                 else:
                     call = binerize_mod_call(score, min_prob, max_prob)
-                    if call != -1:
-                        mapped_modbase_pos[rpos] = call
+                    mapped_modbase_pos[rpos] = call
             if strand == "-":
                 dict_per_read_mod_neg[read.query_name] = [
                     read_len,
