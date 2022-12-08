@@ -758,14 +758,23 @@ def print_counts(
             with open(out_path,'w') as r:
                 r.write("chr,pos,strand,mod,nonmod,unkonwn")
                 r.write("\n")
-                
-                count_table_pos = mod_counts(dicts[0], chrom, "neg", start, end)
-                count_table_neg = mod_counts(dicts[1], chrom, "pos", start, end)
-                # Convert dict to pandas df
-                count_pos_pdDF = pd.DataFrame.from_dict(count_table_pos)
-                count_neg_pdDF = pd.DataFrame.from_dict(count_table_neg)
-                count_pdDF = pd.concat([count_pos_pdDF, count_neg_pdDF]).sort_values(by=["pos"])
-                count_pdDF.to_csv(r, index=False, header=False)
+
+                curr_start = start
+                while (curr_start <= end):# process every 80000 pos at a time and loop over
+                    
+                    if end - curr_start > 80000:
+                        curr_end = curr_start + 80000
+                    else:
+                        curr_end = end
+
+                    count_table_pos = mod_counts(dicts[0], chrom, "neg", curr_start, curr_end)
+                    count_table_neg = mod_counts(dicts[1], chrom, "pos", curr_start, curr_end)
+                    # Convert dict to pandas df
+                    count_pos_pdDF = pd.DataFrame.from_dict(count_table_pos)
+                    count_neg_pdDF = pd.DataFrame.from_dict(count_table_neg)
+                    count_pdDF = pd.concat([count_pos_pdDF, count_neg_pdDF]).sort_values(by=["pos"])
+                    count_pdDF.to_csv(r, index=False, header=False)
+                    curr_start = curr_end + 1
         
         else:
             out_path = out + "/" + prefix + ".csv"
