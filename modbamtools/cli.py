@@ -760,7 +760,7 @@ def print_counts(
                 r.write("\n")
 
                 curr_start = start
-                while (curr_start <= end):# process every 80000 pos at a time and loop over
+                while curr_start <= end:# process every 80000 pos at a time and loop over
                     
                     if end - curr_start > 80000:
                         curr_end = curr_start + 80000
