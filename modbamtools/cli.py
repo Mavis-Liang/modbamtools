@@ -748,7 +748,7 @@ def print_counts(
                 r.write("chr,pos,strand,mod,nonmod,unkonwn")
                 r.write("\n")
                 curr_start = start
-                
+
                 while curr_start <= end:# process every 80000 pos at a time and loop over
                     
                     if end - curr_start > 80000:
@@ -759,8 +759,8 @@ def print_counts(
                     dicts, titles = get_reads(
                         bams,
                         chrom,
-                        start,
-                        end,
+                        curr_start,
+                        curr_end,
                         hap=hap,
                         strand=strands,
                         samp_names=samples,
