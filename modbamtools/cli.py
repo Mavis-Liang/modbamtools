@@ -742,30 +742,31 @@ def print_counts(
         if cluster:
             dicts, titles = cluster2dicts(bams, chrom, start, end)
         if not cluster:
-            dicts, titles = get_reads(
-                bams,
-                chrom,
-                start,
-                end,
-                hap=hap,
-                strand=strands,
-                samp_names=samples,
-                min_prob=can_prob,
-                max_prob=mod_prob,
-            )
-
+            
             out_path = out + "/" + prefix + ".csv"
             with open(out_path,'w') as r:
                 r.write("chr,pos,strand,mod,nonmod,unkonwn")
                 r.write("\n")
-
                 curr_start = start
+                
                 while curr_start <= end:# process every 80000 pos at a time and loop over
                     
                     if end - curr_start > 80000:
                         curr_end = curr_start + 80000
                     else:
                         curr_end = end
+            
+                    dicts, titles = get_reads(
+                        bams,
+                        chrom,
+                        start,
+                        end,
+                        hap=hap,
+                        strand=strands,
+                        samp_names=samples,
+                        min_prob=can_prob,
+                        max_prob=mod_prob,
+                    )
 
                     count_table_pos = mod_counts(dicts[0], chrom, "neg", curr_start, curr_end)
                     count_table_neg = mod_counts(dicts[1], chrom, "pos", curr_start, curr_end)
