@@ -53,7 +53,7 @@ def mod_counts(dict_per_read_mod, chrom, strand, start, end):
         strand_name = "-"
     
     for pos in df.columns:
-        count = df[pos].value_counts(dropna = False).to_dict()
+        count = df[pos].value_counts(dropna = True).to_dict()
         if 0 not in count.keys():
             count[0] = 0
         if 1 not in count.keys():
