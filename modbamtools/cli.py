@@ -776,7 +776,7 @@ def print_counts(
                     count_pdDF = pd.concat([count_pos_pdDF, count_neg_pdDF]).sort_values(by=["pos"])
                     count_pdDF.to_csv(r, index=False, header=False)
                     curr_start = curr_end + 1
-                    click.echo("Successfully processesd " + curr_start)
+                    click.echo("Successfully processesd " + str(curr_start))
         
         else:
             out_path = out + "/" + prefix + ".csv"
