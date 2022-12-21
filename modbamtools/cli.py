@@ -782,8 +782,10 @@ def print_counts(
                 #df.to_csv(r, index=False)
                 count_mat = np.matrix(counts)
                 counts_df = pd.DataFrame(data=count_mat.astype(int))
-                counts_df.to_csv(r, sep=' ', header=False, index=False)
-                click.echo("Successfully processesd " + chrom + ": 1 to " + str(curr_start))
+                df = counts_df.insert(loc=0, column='positions', value=positions)
+                counts_df.to_csv(r, sep='\t', index=False)
+
+                click.echo("Successfully processesd " + chrom + ": " + str(start) + " to " + str(curr_start))
         
         else:
             out_path = out + "/" + prefix + ".csv"
