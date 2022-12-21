@@ -743,7 +743,7 @@ def print_counts(
             dicts, titles = cluster2dicts(bams, chrom, start, end)
         if not cluster:
             
-            out_path = out + "/" + prefix + ".csv"
+            out_path = out + "/" + prefix + ".txt"
             with open(out_path,'a') as r:
                 #r.write("chr,pos,strand,mod,nonmod,unkonwn")
                 #r.write("\n")
@@ -780,7 +780,9 @@ def print_counts(
                 #positions.append(positions)
                 #counts.append(counts)
                 #df.to_csv(r, index=False)
-                print(counts)
+                count_mat = np.matrix(counts)
+                counts_df = pd.DataFrame(data=count_mat.astype(int))
+                counts_df.to_csv(r, sep=' ', header=False, index=False)
                 click.echo("Successfully processesd " + chrom + ": 1 to " + str(curr_start))
         
         else:
