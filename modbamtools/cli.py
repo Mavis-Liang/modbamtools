@@ -748,7 +748,6 @@ def print_counts(
                 #r.write("chr,pos,strand,mod,nonmod,unkonwn")
                 #r.write("\n")
                 curr_start = start
-
                 # while curr_start <= end:# process every 80000 pos at a time and loop over
                     
                 #     if end - curr_start > 80000:
@@ -777,10 +776,11 @@ def print_counts(
                          start,
                          end,
                      )
-                df = pd.DataFrame({"positions": positions, "counts": counts})
+                #df = pd.DataFrame({"positions": positions, "counts": counts})
                 #positions.append(positions)
                 #counts.append(counts)
-                df.to_csv(r, index=False)
+                #df.to_csv(r, index=False)
+                print(counts)
                 click.echo("Successfully processesd " + chrom + ": 1 to " + str(curr_start))
         
         else:
