@@ -745,38 +745,43 @@ def print_counts(
             
             out_path = out + "/" + prefix + ".csv"
             with open(out_path,'a') as r:
-                r.write("chr,pos,strand,mod,nonmod,unkonwn")
-                r.write("\n")
+                #r.write("chr,pos,strand,mod,nonmod,unkonwn")
+                #r.write("\n")
                 curr_start = start
 
-                while curr_start <= end:# process every 80000 pos at a time and loop over
+                # while curr_start <= end:# process every 80000 pos at a time and loop over
                     
-                    if end - curr_start > 80000:
-                        curr_end = curr_start + 80000
-                    else:
-                        curr_end = end
+                #     if end - curr_start > 80000:
+                #         curr_end = curr_start + 80000
+                #     else:
+                #         curr_end = end
             
-                    dicts, titles = get_reads(
-                        bams,
-                        chrom,
-                        curr_start,
-                        curr_end,
-                        hap=hap,
-                        strand=strands,
-                        samp_names=samples,
-                        min_prob=can_prob,
-                        max_prob=mod_prob,
-                    )
+                #     positions, counts = get_counts(
+                #         bams,
+                #         chrom,
+                #         curr_start,
+                #         curr_end,
+                #     )
 
-                    count_table_pos = mod_counts(dicts[0], chrom, "neg", curr_start, curr_end)
-                    count_table_neg = mod_counts(dicts[1], chrom, "pos", curr_start, curr_end)
+                    #count_table_pos = mod_counts(dicts[0], chrom, "neg", curr_start, curr_end)
+                    #count_table_neg = mod_counts(dicts[1], chrom, "pos", curr_start, curr_end)
                     # Convert dict to pandas df
-                    count_pos_pdDF = pd.DataFrame.from_dict(count_table_pos)
-                    count_neg_pdDF = pd.DataFrame.from_dict(count_table_neg)
-                    count_pdDF = pd.concat([count_pos_pdDF, count_neg_pdDF]).sort_values(by=["pos"])
-                    count_pdDF.to_csv(r, index=False, header=False)
-                    curr_start = curr_end + 1
-                    click.echo("Successfully processesd " + chrom + ": 1 to " + str(curr_start))
+                    #count_pos_pdDF = pd.DataFrame.from_dict(count_table_pos)
+                    #count_neg_pdDF = pd.DataFrame.from_dict(count_table_neg)
+                    #count_pdDF = pd.concat([count_pos_pdDF, count_neg_pdDF]).sort_values(by=["pos"])
+                    #count_pdDF.to_csv(r, index=False, header=False)
+                    #curr_start = curr_end + 1
+                positions, counts = get_counts(
+                         bams,
+                         chrom,
+                         start,
+                         end,
+                     )
+                df = pd.DataFrame({"positions": positions, "counts": counts})
+                #positions.append(positions)
+                #counts.append(counts)
+                df.to_csv(r, index=False)
+                click.echo("Successfully processesd " + chrom + ": 1 to " + str(curr_start))
         
         else:
             out_path = out + "/" + prefix + ".csv"

@@ -316,3 +316,10 @@ def get_reads(
             )
             dicts.append(reads)
     return dicts, titles
+
+def get_counts(bams, chrom, start, end):
+    with ModBam(bams) as bam:
+        positions, counts = bam.pileup(
+            chrom, start, end,
+            low_threshold=0.33, high_threshold=0.66, mod_base="m")
+    return positions, counts
