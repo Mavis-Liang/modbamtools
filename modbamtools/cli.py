@@ -586,26 +586,6 @@ def calcHet(bam, bed, min_calls, min_cov, threads, hap, out):
     help="makes tracks from sorted and tabix bed files. This will plot each interval as a rectangle (similar to gtf)",
 )
 @click.option(
-    "-bw",
-    "--bigwig",
-    multiple=True,
-    is_flag=False,
-    default=None,
-    required=False,
-    type=click.Path(exists=True),
-    help="makes a track from bigwig files",
-)
-@click.option(
-    "-bd",
-    "--bedgraph",
-    multiple=True,
-    is_flag=False,
-    default=None,
-    required=False,
-    type=click.Path(exists=True),
-    help="makes a track from bedgraph files",
-)
-@click.option(
     "-s",
     "--samples",
     is_flag=False,
@@ -660,14 +640,6 @@ def calcHet(bam, bed, min_calls, min_cov, threads, hap, out):
     help="probability threshold for modified bases",
 )
 @click.option(
-    "-c",
-    "--cluster",
-    is_flag=True,
-    default=None,
-    type=int,
-    help="cluster the reads based on modification state",
-)
-@click.option(
     "-ht",
     "--heterogeneity",
     is_flag=True,
@@ -679,8 +651,6 @@ def print_counts(
     bams,
     region,
     bed,
-    bigwig,
-    bedgraph,
     samples,
     hap,
     out,
@@ -689,10 +659,10 @@ def print_counts(
     prefix,
     strands,
     batch,
-    cluster,
     heterogeneity,
 ):
-    "Print modified/unmodified counts for a region to a csv"
+    "Print aggregated modified/unmodified counts for a region to a txt"
+    ## Batch not sopported yet!
     if batch:
         out_path = out + "/" + prefix + ".txt" 
         if samples:
@@ -731,52 +701,25 @@ def print_counts(
                     r.write(str(freq))
                     r.write("\n")     
 
-
     elif region:
         chrom = region.strip().split(":")[0]
         start = int(region.strip().split(":")[1].split("-")[0])
         end = int(region.strip().split(":")[1].split("-")[1])
+
         if samples:
             samples = [s for s in samples.strip().split(",")]
         
-        if cluster:
-            dicts, titles = cluster2dicts(bams, chrom, start, end)
         if not cluster:
             
             out_path = out + "/" + prefix + ".txt"
             with open(out_path,'a') as r:
-                # while curr_start <= end:# process every 80000 pos at a time and loop over
-                    
-                #     if end - curr_start > 80000:
-                #         curr_end = curr_start + 80000
-                #     else:
-                #         curr_end = end
-            
-                #     positions, counts = get_counts(
-                #         bams,
-                #         chrom,
-                #         curr_start,
-                #         curr_end,
-                #     )
-
-                    #count_table_pos = mod_counts(dicts[0], chrom, "neg", curr_start, curr_end)
-                    #count_table_neg = mod_counts(dicts[1], chrom, "pos", curr_start, curr_end)
-                    # Convert dict to pandas df
-                    #count_pos_pdDF = pd.DataFrame.from_dict(count_table_pos)
-                    #count_neg_pdDF = pd.DataFrame.from_dict(count_table_neg)
-                    #count_pdDF = pd.concat([count_pos_pdDF, count_neg_pdDF]).sort_values(by=["pos"])
-                    #count_pdDF.to_csv(r, index=False, header=False)
-                    #curr_start = curr_end + 1
                 positions, counts = get_counts(
                          bams,
                          chrom,
                          start,
                          end,
                      )
-                #df = pd.DataFrame({"positions": positions, "counts": counts})
-                #positions.append(positions)
-                #counts.append(counts)
-                #df.to_csv(r, index=False)
+
                 count_mat = np.matrix(counts)
                 
                 ## Process 80000 rows at a time
@@ -806,4 +749,64 @@ def print_counts(
         )
 
 
-    click.echo("Successfully output mod/unmod counts to txt! ")
+    click.echo("Successfully output aggregated mod/unmod counts to txt! ")
+
+
+@cli.command(name="print_reads")
+@click.argument("bams", nargs=-1, type=click.Path(exists=True), required=True)
+@click.option(
+    "-r",
+    "--region",
+    required=False,
+    type=str,
+    help="Region of interest. example: chr21:1-1000",
+)
+@click.option(
+    "-o",
+    "--out",
+    required=False,
+    type=click.Path(exists=True),
+    default=".",
+    help="output path",
+)
+@click.option(
+    "-p",
+    "--prefix",
+    required=False,
+    type=str,
+    default="reads",
+    help="File name for output",
+)
+
+
+def print_reads(
+    bams,
+    region,
+    bed,
+    samples,
+    hap,
+    out,
+    can_prob,
+    mod_prob,
+    prefix,
+    strands,
+    batch,
+    cluster,
+):
+    "Print modification status of a region for every read"
+    chrom = region.strip().split(":")[0]
+    start = int(region.strip().split(":")[1].split("-")[0])
+    end = int(region.strip().split(":")[1].split("-")[1])
+
+    out_path = out + "/" + prefix + ".txt"
+    
+    with open(out_path,'a') as r:
+        for read in bams.reads(chrom, start, end):
+            for pos_mod in read.mod_sites:
+                pos_mod.to_csv(r, sep='\t', index=False)
+                r.write("\n")
+            
+            
+        
+        click.echo("Successfully processesd " + chrom + ": " + str(start) + " to " + str(end))
+            
