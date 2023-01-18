@@ -795,8 +795,7 @@ def print_reads(
             with ModBam(bam) as b:
                 for read in b.reads(chrom, start, end):
                     for pos_mod in read.mod_sites:
-                        query_name, rpos, qpos, strand, mstrand, cbase, mbase, qual = pos_mod
-                        r.write([*pos_mod[1:]], sep='\t',index=False)
+                        r.write([*pos_mod[1:]])
                         #pos_mod.to_csv(r, sep='\t', index=False)
                         #r.write("\n")
         
