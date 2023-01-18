@@ -745,9 +745,6 @@ def print_counts(
             
             out_path = out + "/" + prefix + ".txt"
             with open(out_path,'a') as r:
-                #r.write("chr,pos,strand,mod,nonmod,unkonwn")
-                #r.write("\n")
-                curr_start = start
                 # while curr_start <= end:# process every 80000 pos at a time and loop over
                     
                 #     if end - curr_start > 80000:
@@ -781,11 +778,22 @@ def print_counts(
                 #counts.append(counts)
                 #df.to_csv(r, index=False)
                 count_mat = np.matrix(counts)
-                df = pd.DataFrame(data=count_mat.astype(int))
-                df.insert(loc=0, column='positions', value=positions)
-                df.to_csv(r, sep='\t', index=False)
-
-                click.echo("Successfully processesd " + chrom + ": " + str(start) + " to " + str(curr_start))
+                
+                ## Process 80000 rows at a time
+                list_end = (count_mat.shape)[0]
+                curr_list_start = 0
+                while curr_list_start <= list_end:
+                    if list_end - curr_list_start > 80000:
+                         curr_list_end = curr_list_start + 80000
+                    else:
+                        curr_list_end = list_end
+                    df = pd.DataFrame(data=count_mat[curr_list_start:curr_list_end,:].astype(int))
+                    ## Add the position column to the data frame
+                    df.insert(loc=0, column='positions', value=positions[curr_list_start:curr_list_end])
+                    df.to_csv(r, sep='\t', index=False)
+                    curr_list_start = curr_list_end + 1
+                    
+                click.echo("Successfully processesd " + chrom + ": " + str(start) + " to " + str(end))
         
         else:
             out_path = out + "/" + prefix + ".csv"
@@ -798,4 +806,4 @@ def print_counts(
         )
 
 
-    click.echo("Successfully output mod/unmod counts to csv! ")
+    click.echo("Successfully output mod/unmod counts to txt! ")
