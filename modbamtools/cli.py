@@ -1,4 +1,5 @@
 import click
+import os
 from modbamtools.modbamviz import *
 from modbamtools.calcregions import *
 from modbamtools.clustering import *
@@ -712,6 +713,9 @@ def print_counts(
         if not cluster:
             
             out_path = out + "/" + prefix + ".txt"
+            if os.path.isfile(out_path):
+                os.remove(out_path)
+            
             with open(out_path,'a') as r:
                 positions, counts = get_counts(
                          bams,
@@ -789,13 +793,16 @@ def print_reads(
     end = int(region.strip().split(":")[1].split("-")[1])
 
     out_path = out + "/" + prefix + ".txt"
+
+    if os.path.isfile(out_path):
+        os.remove(out_path)
     
     with open(out_path,'a') as r:
         for bam in bams:
             with ModBam(bam) as b:
                 for read in b.reads(chrom, start, end):
                     for pos_mod in read.mod_sites:
-                        r.write(["%s" % x for x in pos_mod[1:]])
+                        r.write("\t".join(["%s" % x for x in pos_mod[1:]]))
                         r.write("\n")
                         #pos_mod.to_csv(r, sep='\t', index=False)
                         #r.write("\n")
