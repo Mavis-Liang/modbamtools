@@ -782,16 +782,8 @@ def print_counts(
 def print_reads(
     bams,
     region,
-    bed,
-    samples,
-    hap,
     out,
-    can_prob,
-    mod_prob,
-    prefix,
-    strands,
-    batch,
-    cluster,
+    prefix
 ):
     "Print modification status of a region for every read"
     chrom = region.strip().split(":")[0]
@@ -805,8 +797,6 @@ def print_reads(
             for pos_mod in read.mod_sites:
                 pos_mod.to_csv(r, sep='\t', index=False)
                 r.write("\n")
-            
-            
         
         click.echo("Successfully processesd " + chrom + ": " + str(start) + " to " + str(end))
             
