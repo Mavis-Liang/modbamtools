@@ -777,8 +777,6 @@ def print_counts(
     default="reads",
     help="File name for output",
 )
-
-
 def print_reads(
     bams,
     region,
@@ -793,11 +791,12 @@ def print_reads(
     out_path = out + "/" + prefix + ".txt"
     
     with open(out_path,'a') as r:
-        with ModBam(bams) as bam:
-            for read in bam.reads(chrom, start, end):
-                for pos_mod in read.mod_sites:
-                    pos_mod.to_csv(r, sep='\t', index=False)
-                    r.write("\n")
+        for bam in bams:
+            with ModBam(bam) as b:
+                for read in b.reads(chrom, start, end):
+                    for pos_mod in read.mod_sites:
+                        pos_mod.to_csv(r, sep='\t', index=False)
+                        r.write("\n")
         
         click.echo("Successfully processesd " + chrom + ": " + str(start) + " to " + str(end))
             
