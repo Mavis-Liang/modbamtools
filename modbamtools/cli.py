@@ -795,8 +795,9 @@ def print_reads(
             with ModBam(bam) as b:
                 for read in b.reads(chrom, start, end):
                     for pos_mod in read.mod_sites:
-                        pos_mod.to_csv(r, sep='\t', index=False)
-                        r.write("\n")
+                        print(*pos_mod)
+                        #pos_mod.to_csv(r, sep='\t', index=False)
+                        #r.write("\n")
         
         click.echo("Successfully processesd " + chrom + ": " + str(start) + " to " + str(end))
             
