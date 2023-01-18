@@ -793,10 +793,11 @@ def print_reads(
     out_path = out + "/" + prefix + ".txt"
     
     with open(out_path,'a') as r:
-        for read in bams.reads(chrom, start, end):
-            for pos_mod in read.mod_sites:
-                pos_mod.to_csv(r, sep='\t', index=False)
-                r.write("\n")
+        with ModBam(bams) as bam:
+            for read in bam.reads(chrom, start, end):
+                for pos_mod in read.mod_sites:
+                    pos_mod.to_csv(r, sep='\t', index=False)
+                    r.write("\n")
         
         click.echo("Successfully processesd " + chrom + ": " + str(start) + " to " + str(end))
             
