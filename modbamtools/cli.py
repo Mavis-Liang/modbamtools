@@ -709,44 +709,38 @@ def print_counts(
 
         if samples:
             samples = [s for s in samples.strip().split(",")]
-        
-        if not cluster:
             
-            out_path = out + "/" + prefix + ".txt"
-            if os.path.isfile(out_path):
-                os.remove(out_path)
+        out_path = out + "/" + prefix + ".txt"
+        if os.path.isfile(out_path):
+            os.remove(out_path)
             
-            with open(out_path,'a') as r:
-                positions, counts = get_counts(
-                         bams,
-                         chrom,
-                         start,
-                         end,
-                     )
+        with open(out_path,'a') as r:
+            positions, counts = get_counts(
+                        bams,
+                        chrom,
+                        start,
+                        end,
+                    )
 
-                count_mat = np.matrix(counts)
+            count_mat = np.matrix(counts)
                 
-                ## Process 80000 rows at a time
-                list_end = (count_mat.shape)[0]
-                curr_list_start = 0
-                while curr_list_start <= list_end:
-                    if list_end - curr_list_start > 80000:
-                         curr_list_end = curr_list_start + 80000
-                    else:
-                        curr_list_end = list_end
-                    df = pd.DataFrame(data=count_mat[curr_list_start:curr_list_end,:].astype(int))
-                    ## Add the position column to the data frame
-                    df.insert(loc=0, column='positions', value=positions[curr_list_start:curr_list_end])
-                    df.to_csv(r, sep='\t', index=False)
-                    curr_list_start = curr_list_end + 1
+            ## Process 80000 rows at a time
+            list_end = (count_mat.shape)[0]
+            curr_list_start = 0
+            while curr_list_start <= list_end:
+                if list_end - curr_list_start > 80000:
+                        curr_list_end = curr_list_start + 80000
+                else:
+                    curr_list_end = list_end
+                df = pd.DataFrame(data=count_mat[curr_list_start:curr_list_end,:].astype(int))
+                ## Add the position column to the data frame
+                df.insert(loc=0, column='positions', value=positions[curr_list_start:curr_list_end])
+                df.to_csv(r, sep='\t', index=False)
+                curr_list_start = curr_list_end + 1
                     
-                click.echo("Successfully processesd " + chrom + ": " + str(start) + " to " + str(end))
+            click.echo("Successfully processesd " + chrom + ": " + str(start) + " to " + str(end))
         
-        else:
-            out_path = out + "/" + prefix + ".csv"
-            with open(out_path,'a') as r:
-                r.write("chr,pos,mod,unmod,NaN")
-                r.write("\n")
+
     else:
         click.echo(
             "Printing all regions..."
