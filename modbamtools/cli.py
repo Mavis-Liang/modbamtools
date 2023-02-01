@@ -662,7 +662,7 @@ def print_counts(
     batch,
     heterogeneity,
 ):
-    "Print aggregated modified/unmodified counts for a region to a txt"
+    "Print aggregated modified/unmodified counts for a region to a txt (modbampy)"
     ## Batch not sopported yet!
     if batch:
         out_path = out + "/" + prefix + ".txt" 
@@ -735,7 +735,7 @@ def print_counts(
                 df = pd.DataFrame(data=count_mat[curr_list_start:curr_list_end,:].astype(int))
                 ## Add the position column to the data frame
                 df.insert(loc=0, column='positions', value=positions[curr_list_start:curr_list_end])
-                df.to_csv(r, sep='\t', index=False)
+                df.to_csv(r, sep='\t', index=False, header=False)
                 curr_list_start = curr_list_end + 1
                     
             click.echo("Successfully processesd " + chrom + ": " + str(start) + " to " + str(end))
@@ -781,7 +781,7 @@ def print_reads(
     out,
     prefix
 ):
-    "Print modification status of a region for every read"
+    "Print modification status of a site on all covering read (modbampy pileup)"
     chrom = region.strip().split(":")[0]
     start = int(region.strip().split(":")[1].split("-")[0])
     end = int(region.strip().split(":")[1].split("-")[1])
