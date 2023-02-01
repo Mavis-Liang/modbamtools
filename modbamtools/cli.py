@@ -734,7 +734,7 @@ def print_counts(
                     curr_list_end = list_end
                 df = pd.DataFrame(data=count_mat[curr_list_start:curr_list_end+1,:].astype(int))# That right exclusive
                 ## Add the position column to the data frame
-                df.insert(loc=0, column='positions', value=positions[curr_list_start:curr_list_end])
+                df.insert(loc=0, column='positions', value=positions[curr_list_start:curr_list_end + 1])
                 df.to_csv(r, sep='\t', index=False, header=False)
                 curr_list_start = curr_list_end + 1
                     
