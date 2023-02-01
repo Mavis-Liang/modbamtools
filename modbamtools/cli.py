@@ -725,14 +725,14 @@ def print_counts(
             count_mat = np.matrix(counts)
                 
             ## Process 80000 rows at a time
-            list_end = (count_mat.shape)[0]
+            list_end = (count_mat.shape)[0] - 1
             curr_list_start = 0
             while curr_list_start <= list_end:
-                if list_end - curr_list_start > 80000:
-                        curr_list_end = curr_list_start + 80000
+                if list_end - curr_list_start >= 79999:
+                        curr_list_end = curr_list_start + 79999
                 else:
                     curr_list_end = list_end
-                df = pd.DataFrame(data=count_mat[curr_list_start:curr_list_end,:].astype(int))
+                df = pd.DataFrame(data=count_mat[curr_list_start:curr_list_end+1,:].astype(int))# That right exclusive
                 ## Add the position column to the data frame
                 df.insert(loc=0, column='positions', value=positions[curr_list_start:curr_list_end])
                 df.to_csv(r, sep='\t', index=False, header=False)
