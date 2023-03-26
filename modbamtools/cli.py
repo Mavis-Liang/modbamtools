@@ -558,7 +558,7 @@ def calcHet(bam, bed, min_calls, min_cov, threads, hap, out):
             print("\t".join(rec), end="\n", file=o)
 
 
-@cli.command(name="print_reads")
+@cli.command(name="print_counts")
 @click.argument("bams", nargs=-1, type=click.Path(exists=True), required=True)
 @click.option(
     "-r",
@@ -648,7 +648,7 @@ def calcHet(bam, bed, min_calls, min_cov, threads, hap, out):
     type=int,
     help="plot degree of modification heterogeneity across the region",
 )
-def print_reads(
+def print_counts(
     bams,
     region,
     bed,
@@ -662,7 +662,7 @@ def print_reads(
     batch,
     heterogeneity,
 ):
-    "Print aggregated modified/unmodified counts for a region to a txt (modbampy)"
+    "Print modification status of a site on all covering read (modbampy pileup)"
     ## Batch not sopported yet!
     if batch:
         out_path = out + "/" + prefix + ".txt" 
@@ -750,7 +750,7 @@ def print_reads(
     click.echo("Successfully output aggregated mod/unmod counts to txt! ")
 
 
-@cli.command(name="print_counts")
+@cli.command(name="print_reads")
 @click.argument("bams", nargs=-1, type=click.Path(exists=True), required=True)
 @click.option(
     "-r",
@@ -775,13 +775,13 @@ def print_reads(
     default="reads",
     help="File name for output",
 )
-def print_counts(
+def print_reads(
     bams,
     region,
     out,
     prefix
 ):
-    "Print modification status of a site on all covering read (modbampy pileup)"
+    "Print aggregated modified/unmodified counts for a region to a txt (modbampy)"
     chrom = region.strip().split(":")[0]
     start = int(region.strip().split(":")[1].split("-")[0])
     end = int(region.strip().split(":")[1].split("-")[1])
