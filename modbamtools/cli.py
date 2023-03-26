@@ -558,7 +558,7 @@ def calcHet(bam, bed, min_calls, min_cov, threads, hap, out):
             print("\t".join(rec), end="\n", file=o)
 
 
-@cli.command(name="print_counts")
+@cli.command(name="print_reads")
 @click.argument("bams", nargs=-1, type=click.Path(exists=True), required=True)
 @click.option(
     "-r",
@@ -648,7 +648,7 @@ def calcHet(bam, bed, min_calls, min_cov, threads, hap, out):
     type=int,
     help="plot degree of modification heterogeneity across the region",
 )
-def print_counts(
+def print_reads(
     bams,
     region,
     bed,
@@ -750,7 +750,7 @@ def print_counts(
     click.echo("Successfully output aggregated mod/unmod counts to txt! ")
 
 
-@cli.command(name="print_reads")
+@cli.command(name="print_counts")
 @click.argument("bams", nargs=-1, type=click.Path(exists=True), required=True)
 @click.option(
     "-r",
@@ -775,7 +775,7 @@ def print_counts(
     default="reads",
     help="File name for output",
 )
-def print_reads(
+def print_counts(
     bams,
     region,
     out,
